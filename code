@@ -1,0 +1,41 @@
+from flask import Flask, render_template, request, redirect, url_for
+
+app = Flask(__name__)
+
+# a list of products to display on the website
+products = [
+    {'name': 'Product 1', 'price': 100},
+    {'name': 'Product 2', 'price': 200},
+    {'name': 'Product 3', 'price': 300},
+    {'name': 'Product 4', 'price': 400},
+]
+
+# a list of orders placed by customers
+orders = []
+
+
+@app.route('/')
+def home():
+    return render_template('index.html', products=products)
+
+
+@app.route('/buy', methods=['POST'])
+def buy():
+    # get the index of the product being purchased from the form data
+    product_index = int(request.form['product_index'])
+
+    # add the purchased product to the orders list
+    orders.append(products[product_index])
+
+    # redirect to the cart page
+    return redirect(url_for('cart'))
+
+
+@app.route('/cart')
+def cart():
+    total_price = sum([product['price'] for product in orders])
+    return render_template('cart.html', orders=orders, total_price=total_price)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
